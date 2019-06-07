@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<annotation>
+    <folder>JPEGImages</folder>
+    <filename>16825.jpg</filename>
+    <path>/home/environment/darknet/darknet-master/plane_05020404/scripts/test/jpg/16825.jpg</path>
+    <object>
+        <name>05020404</name>
+        <bndbox>
+            <xmin>1152</xmin>
+            <ymin>592</ymin>
+            <xmax>1342</xmax>
+            <ymax>698</ymax>
+        </bndbox>
+    </object>
+</annotation>

@@ -1,0 +1,26 @@
+<annotation>
+	<folder>金具</folder>
+	<filename>05622.jpg</filename>
+	<path>/home/data/all/05622.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1840</width>
+		<height>1228</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>05020403</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>876</xmin>
+			<ymin>638</ymin>
+			<xmax>952</xmax>
+			<ymax>656</ymax>
+		</bndbox>
+	</object>
+</annotation>
