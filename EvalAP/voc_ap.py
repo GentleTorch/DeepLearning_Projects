@@ -20,6 +20,7 @@ import glob
 
 import xml.etree.ElementTree as ET
 import numpy as np
+import argparse
 
 
 def parse_xml(filename):
@@ -97,7 +98,7 @@ def eval_od(truthpath, detpath, classname, iou_thresh=0.5):
         key = filename.split('/')[-1]
         det_recs[key] = parse_xml(filename)
 
-    print(det_recs)
+    # print(det_recs)
 
     pred_recs = {}
     len_pred_boxes = 0
@@ -148,8 +149,8 @@ def eval_od(truthpath, detpath, classname, iou_thresh=0.5):
             i += 1
 
     print("Total Predicted boxes: ", len_pred_boxes)
-    print("tp: ", tp)
-    print("fp: ", fp)
+    # print("tp: ", tp)
+    # print("fp: ", fp)
     fp = np.cumsum(fp)
     tp = np.cumsum(tp)
     rec = tp / float(npos)
@@ -158,11 +159,47 @@ def eval_od(truthpath, detpath, classname, iou_thresh=0.5):
     prec = tp / np.maximum(tp + fp, np.finfo(np.float64).eps)
     ap = cal_ap(rec, prec)
 
-    print("cumsum tp: ", tp)
-    print("cumsum fp", fp)
-    return rec, prec, ap
+    # print("cumsum tp: ", tp)
+    # print("cumsum fp", fp)
+    return rec[-1], prec[-1], ap
 
 
-recall, precision, ap = eval_od("./result/truth/", "./result/det/", "05020404")
+# recall, precision, ap = eval_od("./result/truth/", "./result/det/", "05020404")
+#
+# print("AP: {}.".format(ap))
 
-print("AP: {}.".format(ap))
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Calculate mAP...")
+    parser.add_argument("-t", "--truthpath", help="the original labeled xml set")
+    parser.add_argument("-d", "--detpath", help="the predicted results xml set")
+    parser.add_argument("-l", "--labeltxt", help="all category we detect")
+
+    args = parser.parse_args()
+    if args.truthpath is None:
+        print("we need truth xml directory.")
+        exit(0)
+    if args.detpath is None:
+        print("we need detected result xml directory.")
+        exit(0)
+    if args.labeltxt is None:
+        print("we need label txt file.")
+        exit(0)
+
+    f = open(args.labeltxt, 'r')
+    category_list = f.readlines()
+    mAP = 0.0
+    total_len = len(category_list)
+
+    for category in category_list:
+        print("-----------------------------------")
+        category = category.strip("\r\n")
+        print("Processing: ", category)
+        recall, precision, ap = eval_od(args.truthpath, args.detpath, category)
+        print(" Recall: {}.\n Precision: {}.\n AP: {}.".format(recall, precision, ap))
+        mAP += ap
+
+    mAP = mAP / total_len
+
+    print("\n mAP: {}".format(mAP))
+
+    f.close()

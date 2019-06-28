@@ -23,6 +23,8 @@ import glob
 import xml.etree.ElementTree as ET
 import numpy as np
 
+import argparse
+
 
 def parse_xml(filename):
     """
@@ -92,7 +94,7 @@ def eval_od(truthpath, detpath, classname, iou_thresh=0.5):
         # "difficult":difficult,
         # "det":det}
 
-    print("Ground Truth: ", class_recs)
+    # print("Ground Truth: ", class_recs)
 
     # get the detected results, boxes
     det_xml_list = glob.glob(detpath + "*.xml")
@@ -101,7 +103,7 @@ def eval_od(truthpath, detpath, classname, iou_thresh=0.5):
         key = filename.split('/')[-1]
         det_recs[key] = parse_xml(filename)
 
-    print(det_recs)
+    # print(det_recs)
 
     pred_recs = {}
     for filename in det_xml_list:
@@ -111,7 +113,7 @@ def eval_od(truthpath, detpath, classname, iou_thresh=0.5):
 
         pred_recs[key] = {"bbox": bbox}
 
-    print("Predicted Result: ", pred_recs)
+    # print("Predicted Result: ", pred_recs)
 
     # calculate the ap, recall
     tp = 0
@@ -159,6 +161,37 @@ def eval_od(truthpath, detpath, classname, iou_thresh=0.5):
     return rec, prec
 
 
-recall, precision = eval_od("./result/truth/", "./result/det/", "05020404")
+# recall, precision = eval_od("./result/truth/", "./result/det/", "05020404")
+#
+# print(" Recall: {}.\n Precision: {}.".format(recall, precision))
 
-print(" Recall: {}.\n Precision: {}.".format(recall, precision))
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Calculate mAP...")
+    parser.add_argument("-t", "--truthpath", help="the original labeled xml set")
+    parser.add_argument("-d", "--detpath", help="the predicted results xml set")
+    parser.add_argument("-l", "--labeltxt", help="all category we detect")
+
+    args = parser.parse_args()
+    if args.truthpath is None:
+        print("we need truth xml directory.")
+        exit(0)
+    if args.detpath is None:
+        print("we need detected result xml directory.")
+        exit(0)
+    if args.labeltxt is None:
+        print("we need label txt file.")
+        exit(0)
+
+    f = open(args.labeltxt, 'r')
+    category_list = f.readlines()
+
+    for category in category_list:
+        print("---------------------")
+        print("Processing: ", category)
+        recall, precision = eval_od(args.truthpath, args.detpath, category)
+        print(" Recall: {}.\n Precision: {}.".format(recall, precision))
+
+
+
+    f.close()
+
